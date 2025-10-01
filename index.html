@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ShopSmart - Home</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+
+  
+  <nav>
+    <div class="left-links" id="authLinks">
+      <a href="login.html">Login</a>
+      <a href="register.html">Register</a>
+    </div>
+    <div class="brand">ShopSmart</div>
+    <div class="right-links">
+      <a href="index.html" class="active">Home</a>
+      <a href="cart.html">Cart (<span id="cartCount">0</span>)</a>
+      <a href="reviews.html">Reviews</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </nav>
+
+  
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Search products..." onkeyup="searchProducts()">
+  </div>
+
+  
+  <div class="categories">
+    <button onclick="filterCategory('All')">All</button>
+    <button onclick="filterCategory('Jewellery')">Jewellery</button>
+    <button onclick="filterCategory('Accessories')">Accessories</button>
+    <button onclick="filterCategory('Dresses')">Dresses</button>
+  </div>
+
+  
+  <section class="gallery"></section>
+
+  <script>
+    // Logged-in user display
+    let user = JSON.parse(localStorage.getItem("loggedInUser"));
+    if(user){
+      document.getElementById("authLinks").innerHTML = `
+        <span>👋 Welcome, ${user.name}</span>
+        <a href="#" onclick="logout()">Logout</a>`;
+    }
+    function logout(){
+      localStorage.removeItem("loggedInUser");
+      window.location.reload();
+    }
+
+    // Cart count display
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const cartCount = document.getElementById("cartCount");
+    cartCount.innerText = cart.length;
+
+    // Product array
+    const products = [
+      { title: "Formal Blue Shirt", price: "499", img: "https://pantproject.com/cdn/shop/articles/blue-shirt-pant-combination_73430be0-a819-457f-b4df-fbd727dc015d_600x600_crop_center.png?v=1751363093", category: "Dresses" },
+      { title: " Necklace combo set", price: "2999", img: "https://cpimg.tistatic.com/7132725/b/1/73920-matte-gold-combo-necklace-set.jpg", category: "Jewellery" },
+      { title: "Leather Wallet", price: "157", img: "https://m.media-amazon.com/images/I/81pNCj544nL._UY1100_.jpg", category: "Accessories" },
+      { title: "organza Dress", price: "1050", img: "https://www.indianrani.com/cdn/shop/files/714-5.jpg?v=1707453904&width=1946", category: "Dresses" },
+      { title: "peocock Earrings", price: "300", img: "https://www.sasitrends.com/cdn/shop/files/1775I-Elegant-Temple-Matte-Gold-Peacock-Earrings-With-American-Diamond-Stones-And-Pearl-Drops-Classic-Festive-Jewellery-Sasitrends.gif?v=1752739934", category: "Jewellery" },
+      { title:"silver plated Bangles",price:"350",img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-wVmyRwGp7MZ7B-sMo98ljNk7YQaGGghZJw&s",category:"Jewellery"},
+      { title:  "Blue BeadsKundan heap Earnings", price:"210",img:"https://karatcart.com/cdn/shop/products/33015425_1_6a10bada-8036-423c-b950-d055abc77529.jpg?v=1656479470",category:"Jewellery"},
+      { title: "Formal White Shirt", price: "501", img: "https://myraymond.com/cdn/shop/files/PMSX18661-W1-1.jpg?v=1729163840", category: "Dresses" },
+      { title: " Noise Twist Go Watch",price:"1567",img:"https://vsprod.vijaysales.com/media/catalog/product/2/2/227197-image1_1.jpg?optimize=medium&fit=bounds&height=500&width=500",category:"Accessories"},
+      { title: "long dress",price:"1000",img:"https://images.glowroad.com/faceview/j3i/dd/j9e/b1e/imgs/705c0416-3acb-4c10-8df9-9f61db83fb1b_14943398-md200x200.jpg",category: "Dresses"},
+      { title:  "Watch for women",price:"1699",img :"https://assets.myntassets.com/dpr_1.5,q_30,w_400,c_limit,fl_progressive/assets/images/25825856/2025/5/22/8c4405bd-8091-442a-ba1e-772e49c7cb321747902777921-French-Connection-Women-Stainless-Steel-Bracelet-Style-Strap-1.jpg",category:"Accessories"},
+      { title: " Wedding Sherwani",price:"1700",img:"https://images.indianweddingsaree.com/images/tr:w-240,q-95/1913536.jpg",category:"Dresses"},
+      { title: "sport shoes",price:"440",img:"https://m.media-amazon.com/images/I/71f3BmjCwtL._UY1000_.jpg",category:"Accessories"},
+      { title:  "Trending boys jeans",price:"399",img:"https://5.imimg.com/data5/MI/JO/MY-33510293/trendy-boys-jeans.jpg",category:"Dresses" },
+      { title: "invisible chain",price:"219",img:"https://sparkleandglow.co.in/cdn/shop/files/17989_0.jpg?v=1754184779&width=900",category:"Jewellery"},
+      { title: "Floral western top",price:"200",img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTp9M6sajGe6nmSqW6qCyyTDTrBkHHISUrJxA&s",category:"Dresses"},
+      { title: "Noise Buds",price:"1899",img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSwaI2XjM23bfiDaFbzsg0E1yrOeZpwu6of-w&s",category:"Accessories"},
+      { title:  "Baggy jeans",price:"499",img:"https://i.pinimg.com/736x/94/58/56/9458566a511567b86cdd72a45dfc80c5.jpg",category:"Dresses"},
+      { title: "4-level shoe rock",price:"197",img:"https://www.kitchenstuffplus.com/media/catalog/product/9/1/91635-902.jpg",category:"Accessories"},
+      { title:"woolen scarf",price:"155",img:"https://i.etsystatic.com/10585666/r/il/b88798/1420247435/il_570xN.1420247435_2n3o.jpg",category:"Dresses"},
+      { title:"Antique multicolor Bangles",price:"3367",img:"https://www.tarinika.in/cdn/shop/files/ABX2807X_2.jpg?v=1714992487",category:"Jewellery"},
+      { title:"Green Aviator sunglasses",price:"199",img:"https://d3995ea24pmi7m.cloudfront.net/media/catalog/product/M/8/M8023GR5V_1_lar.jpg",category:"Accessories"},
+      { title:" Brown Flipflop Slippers",price:"144", img:"https://assets.ajio.com/medias/sys_master/root/20230621/2K1T/64929b2242f9e729d76aaa47/-473Wx593H-464303186-brown-MODEL.jpg",category:"Accessories"},
+      { title:"Leather HandBag",price:"1999",img:"https://i5.walmartimages.com/asr/b62aa138-4ba0-43c2-b590-a19b633b3339.7aacb5f086ea6445474be1fccf8a73de.jpeg",category:"Accessories"},
+      { title:" silver plated ring",price:"999",img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRenHAgw-urmhob-knNHytjoVAzpbU_R152Ig&s",category:"Jewellery"},
+      { title:"pearls Beads ethinic jewellery set",price:"1999",img:"https://www.voylla.com/cdn/shop/products/EUCCU20158_CS_1ba0247d-9353-4d1a-ab7f-416399bb3d43.jpg?v=1701623784",category:"Jewllery"},
+      { title:"Flower plastic Jewellery",price:"399",img:"https://m.media-amazon.com/images/I/71a2StU1TwL._UY1100_.jpg",category:"Jewellery"},
+      { title:"Black Sherwani for kids",price:"3999",img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS-3ZWZtPp2AYC5uABnQeJOlPeg6OqhiftdRA&s",category:"Dresses"},
+      { title:"Red cloudy frill Gown",price:"4999",img:"https://liandli.in/cdn/shop/files/LIDG192_1_-min_800x.jpg?v=1688447887",category:"Dresses"},
+      { title:"Earrings",price:"399",img:"https://cdn.eternz.com/thumbnails/products/AMAAMARAERI-G_1_a0e590de_thumbnail_1024.jpg",category:"Jewellery"},
+      { title:"Multishape Neck Piece",price:"438",img:"https://m.media-amazon.com/images/I/61Ayk4IOZjL._UY1100_.jpg",category:"Jewellery"},
+      { title:"Black bead Mangalsutra",price:"299",img:"https://assets0.mirraw.com/images/13447334/image_original_zoom.jpeg?1753962878",category:"Jewellery"},
+      { title:"Leather Belt",price:"199",img:"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS3BmaLyVmPTMVPT3dXBUYVn7XxPCO_FnxxJA&s",category:"Accessories"},
+
+       
+    ];
+
+    const gallery = document.querySelector(".gallery");
+
+   
+    function displayProducts(items){
+      gallery.innerHTML = "";
+      items.forEach(product => {
+        gallery.innerHTML += `
+        <div class="product-card" data-category="${product.category}">
+          <img src="${product.img}" alt="${product.title}">
+          <div class="product-title">${product.title}</div>
+          <div class="stars">⭐⭐⭐⭐☆</div>
+          <div class="product-price">₹${product.price}</div>
+          <button class="add-to-cart" onclick="addToCart('${product.title}','₹${product.price}','${product.img}')">Add to Cart</button>
+        </div>`;
+      });
+    }
+
+    
+    displayProducts(products);
+
+    // Search function
+    function searchProducts(){
+      const query = document.getElementById("searchInput").value.toLowerCase();
+      const filtered = products.filter(p => p.title.toLowerCase().includes(query));
+      displayProducts(filtered);
+    }
+
+    // Category filter
+    function filterCategory(category){
+      if(category === "All"){
+        displayProducts(products);
+      } else {
+        const filtered = products.filter(p => p.category === category);
+        displayProducts(filtered);
+      }
+    }
+
+    // Add to Cart function
+    function addToCart(title, price, img){
+      let user = JSON.parse(localStorage.getItem("loggedInUser"));
+      if(!user){
+        alert("⚠️ Please login to add items to cart.");
+        window.location.href = "login.html";
+        return;
+      }
+      cart.push({ title, price, img });
+      localStorage.setItem("cart", JSON.stringify(cart));
+      alert("✅ " + title + " added to cart!");
+      cartCount.innerText = cart.length;
+    }
+  </script>
+</body>
+</html>

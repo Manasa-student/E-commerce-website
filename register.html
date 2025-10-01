@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register - ShopSmart</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="script.js"></script>
+</head>
+<body>
+
+  <nav>
+    <div class="left-links" id="authLinks">
+      <a href="login.html">Login</a>
+      <a href="register.html">Register</a>
+    </div>
+    <div class="brand">ShopSmart</div>
+    <div class="right-links">
+      <a href="index.html">Home</a>
+      <a href="cart.html">Cart (<span id="cartCount">0</span>)</a>
+      <a href="reviews.html">Reviews</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </nav>
+
+  <form class="auth-form" id="registerForm">
+    <h2>Register</h2>
+    <input type="text" id="name" placeholder="Full Name" required>
+    <input type="email" id="email" placeholder="Email" required>
+    <input type="password" id="password" placeholder="Password" required>
+    <button type="submit">Register</button>
+    <p>Already have an account? <a href="login.html">Login</a></p>
+  </form>
+
+  <script>
+    // Update cart count in navbar
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const countEl = document.getElementById("cartCount");
+    if(countEl) countEl.innerText = cart.length;
+
+    // Register form
+    const registerForm = document.getElementById("registerForm");
+    registerForm.addEventListener("submit", function(e){
+      e.preventDefault();
+
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if(!name || !email || !password){
+        alert("⚠️ Please fill all fields!");
+        return;
+      }
+
+      // Get existing users
+      let users = JSON.parse(localStorage.getItem("users")) || [];
+
+      // Check if email already exists
+      const exists = users.some(u => u.email === email);
+      if(exists){
+        alert("❌ Email already registered. Please login!");
+        window.location.href = "login.html";
+        return;
+      }
+
+      // Save new user
+      users.push({ name, email, password });
+      localStorage.setItem("users", JSON.stringify(users));
+
+      alert("✅ Registration successful! Please login.");
+      window.location.href = "login.html";
+    });
+  </script>
+
+</body>
+</html>

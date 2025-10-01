@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Cart</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav>
+    <div class="left-links" id="authLinks">
+      <a href="login.html">Login</a>
+      <a href="register.html">Register</a>
+    </div>
+    <div class="brand">ShopSmart</div>
+    <div class="right-links">
+      <a href="index.html">Home</a>
+      <a href="cart.html" class="active">Cart (<span id="cartCount">0</span>)</a>
+      <a href="reviews.html">Reviews</a>
+      <a href="contact.html">Contact</a>
+    </div>
+  </nav>
+
+  <div class="cart-container">
+    <h1>Your Cart</h1>
+    <div id="cartItems"></div>
+    <h2 id="totalCost">Total: ₹0</h2>
+    <button class="place-order" onclick="placeOrder()">Place Order</button>
+  </div>
+
+  <script>
+  
+  // Show welcome if logged in
+  let user = JSON.parse(localStorage.getItem("loggedInUser"));
+  if(user){
+    document.getElementById("authLinks").innerHTML = `
+      <span>👋 Welcome, ${user.name}</span>
+      <a href="#" onclick="logout()">Logout</a>`;
+  }
+
+  function logout(){
+    localStorage.removeItem("loggedInUser");
+    window.location.href="index.html";
+  }
+
+  // Load cart items
+  function loadCart(){
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    let container = document.getElementById("cartItems");
+    let totalCost = 0;
+
+    container.innerHTML = ""; // Clear old content
+
+    if(cart.length === 0){
+      container.innerHTML = "<p>Your cart is empty 🛒</p>";
+      document.getElementById("totalCost").innerText = "Total: ₹0";
+      return;
+    }
+
+    cart.forEach((item, index) => {
+      let priceNum = parseFloat(item.price.replace("₹",""));
+      totalCost += priceNum;
+
+      container.innerHTML += `
+        <div class="cart-item">
+          <img src="${item.img}" alt="${item.title}" width="80" height="80" style="border-radius:6px;">
+          <span>${item.title} - ${item.price}</span>
+          <button onclick="removeItem(${index})">❌</button>
+        </div>`;
+    });
+
+    document.getElementById("totalCost").innerText = "Total: ₹" + totalCost;
+    document.getElementById("cartCount").innerText = cart.length;
+  }
+
+  // Remove item from cart
+  function removeItem(i){
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    cart.splice(i, 1);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    loadCart();
+  }
+
+  // Place Order
+  function placeOrder(){
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    if(cart.length === 0){
+      alert("❌ Your cart is empty!");
+      return;
+    }
+    alert("🎉 Order Confirmed! Thank you for shopping.");
+    localStorage.setItem("cart", JSON.stringify([])); // clear cart
+    loadCart();
+  }
+
+
+  loadCart();
+
+
+
+  </script>
+</body>
+</html>
